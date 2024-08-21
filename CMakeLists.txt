@@ -1,28 +1,33 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.14)
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+project(TicTacToeAI)
 
-project ("TicTacToeAI")
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add source to this project's executable.
-add_executable (TicTacToeAI "src/main.cpp")
+# FetchContent module is available since CMake 3.11
+include(FetchContent)
 
-target_link_libraries(TicTacToeAI ${CMAKE_SOURCE_DIR}/lib/sfml-main.lib)
-target_link_libraries(TicTacToeAI ${CMAKE_SOURCE_DIR}/lib/sfml-window.lib)
-target_link_libraries(TicTacToeAI ${CMAKE_SOURCE_DIR}/lib/sfml-system.lib)
-target_link_libraries(TicTacToeAI ${CMAKE_SOURCE_DIR}/lib/sfml-graphics.lib)
+# Fetch SFML
+FetchContent_Declare(
+  SFML
+  GIT_REPOSITORY https://github.com/SFML/SFML.git
+  GIT_TAG 2.5.1
+)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+FetchContent_MakeAvailable(SFML)
 
-set_property(TARGET TicTacToeAI PROPERTY CXX_STANDARD 17)
-set_property(TARGET TicTacToeAI PROPERTY CXX_STANDARD_REQUIRED ON)
+# Add source to this project's executable
+add_executable(TicTacToeAI "src/main.cpp")
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+# Link SFML libraries
+target_link_libraries(TicTacToeAI sfml-graphics sfml-window sfml-system)
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET TicTacToeAI PROPERTY CXX_STANDARD 20)
-endif()
+# Include SFML headers
+target_include_directories(TicTacToeAI PRIVATE ${SFML_INCLUDE_DIR})
+
+# Set output directory
+set_target_properties(TicTacToeAI PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+)
